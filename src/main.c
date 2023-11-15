@@ -38,7 +38,7 @@
 
 #define USER_BUTTON             DK_BTN1_MSK
 
-static bool app_button_state;
+static uint32_t app_button_state;
 
 static const struct bt_data ad[] = {
 	BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
@@ -144,9 +144,17 @@ static struct bt_conn_auth_cb conn_auth_callbacks;
 static struct bt_conn_auth_info_cb conn_auth_info_callbacks;
 #endif
 
-static void app_led_cb(bool led_state)
+static void app_led_cb(uint32_t led_state)//(bool led_state)
 {
-	dk_set_led(USER_LED, led_state);
+	if(led_state==1)
+	{
+		dk_set_led(USER_LED, 1);
+	}else if(led_state == 0){
+		dk_set_led(USER_LED, 0);
+	}else{
+		//dk_set_led(USER_LED, led_state);
+	}
+	printk("data:%d",led_state);
 }
 
 static bool app_button_cb(void)
@@ -162,10 +170,12 @@ static struct bt_lbs_cb lbs_callbacs = {
 static void button_changed(uint32_t button_state, uint32_t has_changed)
 {
 	if (has_changed & USER_BUTTON) {
-		uint32_t user_button_state = button_state & USER_BUTTON;
+		uint32_t user_button_state = 0x34;//button_state & USER_BUTTON;
 
-		bt_lbs_send_button_state(user_button_state);
-		app_button_state = user_button_state ? true : false;
+		bt_lbs_send_button_state(0xffffffff);//(user_button_state);
+		
+		app_button_state = user_button_state ;//? true : false;
+		printk("test:%d",app_button_state);
 	}
 }
 
